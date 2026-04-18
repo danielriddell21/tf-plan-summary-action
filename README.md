@@ -1,5 +1,8 @@
 # tf-plan-summary-action
 
+[![CI](https://github.com/danielriddell21/tf-plan-summary-action/actions/workflows/ci.yml/badge.svg)](https://github.com/danielriddell21/tf-plan-summary-action/actions/workflows/ci.yml)
+[![Go 1.26](https://img.shields.io/badge/go-1.26-00ADD8?logo=go)](https://go.dev)
+
 Parses `terraform show -json` output and writes a human-readable summary to the GitHub Actions job summary — a diff table plus a collapsible field-level diff powered by [unum](https://github.com/danielriddell21/unum).
 
 ## Example output
