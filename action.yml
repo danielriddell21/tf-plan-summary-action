@@ -1,0 +1,19 @@
+name: Terraform Plan Summary
+description: Parses terraform show -json output and writes a human-readable diff table to the GitHub Actions job summary.
+
+branding:
+  icon: layers
+  color: purple
+
+inputs:
+  plan-file:
+    description: Path to the terraform show -json output file, relative to the workspace root.
+    required: false
+    default: plan.json
+
+runs:
+  using: composite
+  steps:
+    - name: Write plan summary
+      shell: bash
+      run: python3 "${{ github.action_path }}/summarise.py" "${{ inputs.plan-file }}"
