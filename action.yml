@@ -14,6 +14,19 @@ inputs:
 runs:
   using: composite
   steps:
+    - uses: actions/setup-go@v5
+      with:
+        go-version: '1.23'
+        cache: false
+
+    - name: Install unum
+      shell: bash
+      run: go install github.com/danielriddell21/unum/cmd/unum@latest
+
+    - name: Build summariser
+      shell: bash
+      run: go build -o /tmp/tf-plan-summary "${{ github.action_path }}"
+
     - name: Write plan summary
       shell: bash
-      run: python3 "${{ github.action_path }}/summarise.py" "${{ inputs.plan-file }}"
+      run: /tmp/tf-plan-summary "${{ inputs.plan-file }}"

@@ -1,20 +1,32 @@
 # tf-plan-summary-action
 
-Parses `terraform show -json` output and writes a human-readable diff table to the GitHub Actions job summary.
+Parses `terraform show -json` output and writes a human-readable summary to the GitHub Actions job summary — a diff table plus a collapsible field-level diff powered by [unum](https://github.com/danielriddell21/unum).
 
 ## Example output
 
-```
-## Terraform Plan
+**Summary table** (always shown):
 
-**2 to add · 1 to change · 0 to destroy · 0 to replace**
+**2 to add &nbsp;·&nbsp; 1 to change &nbsp;·&nbsp; 0 to destroy &nbsp;·&nbsp; 0 to replace**
 
-| Action     | Resource                          |
-|------------|-----------------------------------|
-| ➕ create  | `aws_instance.web`                |
-| ➕ create  | `aws_security_group.web`          |
-| 📝 update  | `aws_s3_bucket.assets`            |
+| Action | Resource |
+|--------|----------|
+| ➕ create | `aws_instance.web` |
+| ➕ create | `aws_security_group.web` |
+| 📝 update | `aws_s3_bucket.assets` |
+
+**Field-level diff** (collapsed beneath the table):
+
+<details><summary>Field-level diff</summary>
+
+```diff
+  +2  -1  ~1
++ .aws_instance.web                         
++ .aws_security_group.web                   
+- .aws_instance.legacy                      
+! .aws_s3_bucket.assets.versioning.enabled  false → true
 ```
+
+</details>
 
 ## Usage
 
