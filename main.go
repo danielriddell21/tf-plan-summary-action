@@ -116,6 +116,7 @@ func unumDiff(planFile string) string {
 		"unum", "diff",
 		"--format", "terraform",
 		"--no-color",
+		"--no-stat",
 		"--quiet",
 		planFile, planFile,
 	).Output()

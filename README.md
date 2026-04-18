@@ -22,7 +22,6 @@ Parses `terraform show -json` output and writes a human-readable summary to the 
 <details><summary>Field-level diff</summary>
 
 ```diff
-  +2  -1  ~1
 + .aws_instance.web                         
 + .aws_security_group.web                   
 - .aws_instance.legacy                      
