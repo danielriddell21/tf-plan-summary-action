@@ -3,6 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 export BINARY=/tmp/tf-plan-summary-test
+unset GITHUB_STEP_SUMMARY
 go build -o "$BINARY" .
 
 FAILED=0
