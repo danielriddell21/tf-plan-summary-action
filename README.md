@@ -3,32 +3,44 @@
 [![CI](https://github.com/danielriddell21/tf-plan-summary-action/actions/workflows/ci.yml/badge.svg)](https://github.com/danielriddell21/tf-plan-summary-action/actions/workflows/ci.yml)
 [![Go 1.26](https://img.shields.io/badge/go-1.26-00ADD8?logo=go)](https://go.dev)
 
-Parses `terraform show -json` output and writes a human-readable summary to the GitHub Actions job summary — a diff table plus a collapsible field-level diff powered by [unum](https://github.com/danielriddell21/unum).
+Parses `terraform show -json` output and writes a human-readable summary to the GitHub Actions job summary — a diff table plus a collapsible, `terraform plan`-style field-level diff. The plan parsing and rendering are provided by the importable [`unum/pkg/terraform`](https://github.com/danielriddell21/unum/tree/trunk/pkg/terraform) package, so the action is a single self-contained Go build with no runtime CLI dependency.
 
 ## Example output
 
-**Summary table** (always shown):
+The `## Terraform Plan` heading, the `Terraform will perform…` preamble and the `Plan:` summary line sit outside the code block. Inside the fenced ```diff``` block, change markers are in column 0 so GitHub colours the lines: `+` created (green), `-` destroyed (red) and `!` updated-in-place (amber):
 
-**2 to add &nbsp;·&nbsp; 1 to change &nbsp;·&nbsp; 0 to destroy &nbsp;·&nbsp; 0 to replace**
+---
 
-| Action | Resource |
-|--------|----------|
-| ➕ create | `aws_instance.web` |
-| ➕ create | `aws_security_group.web` |
-| 📝 update | `aws_s3_bucket.assets` |
+## Terraform Plan
 
-**Field-level diff** (collapsed beneath the table):
-
-<details><summary>Field-level diff</summary>
+Terraform will perform the following actions:
 
 ```diff
-+ .aws_instance.web                         
-+ .aws_security_group.web                   
-- .aws_instance.legacy                      
-! .aws_s3_bucket.assets.versioning.enabled  false → true
+    # aws_instance.web will be created
++   resource "aws_instance" "web" {
++     ami           = "ami-123"
++     arn           = (known after apply)
++     instance_type = "t3.micro"
++   }
+
+    # aws_s3_bucket.assets will be updated in-place
+!   resource "aws_s3_bucket" "assets" {
+!     versioning {
+!       enabled = false -> true
+!     }
+      # (1 unchanged attribute hidden)
+!   }
+
+    # aws_instance.legacy will be destroyed
+-   resource "aws_instance" "legacy" {
+-     ami           = "ami-old" -> null
+-     instance_type = "t2.micro" -> null
+-   }
 ```
 
-</details>
+Plan: 2 to add, 1 to change, 1 to destroy, 0 to replace.
+
+---
 
 ## Usage
 
