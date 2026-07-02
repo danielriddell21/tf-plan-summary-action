@@ -8,9 +8,9 @@ build:
 test:
     bash scripts/test.sh
 
-# install unum then build and run tests
+# build and run tests
 ci:
-    go install github.com/danielriddell21/unum/cmd/unum@latest
+    go build -o {{ binary }} .
     just test
 
 # install binary to GOPATH/bin

@@ -19,10 +19,6 @@ runs:
         go-version: '1.26'
         cache: false
 
-    - name: Install unum
-      shell: bash
-      run: go install github.com/danielriddell21/unum/cmd/unum@latest
-
     - name: Build summariser
       shell: bash
       run: go build -o /tmp/tf-plan-summary "${{ github.action_path }}"

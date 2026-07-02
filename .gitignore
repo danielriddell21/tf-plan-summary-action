@@ -2,3 +2,4 @@ tf-plan-summary-action
 tf-plan-summary-action.exe
 *.test
 *.out
+bin/

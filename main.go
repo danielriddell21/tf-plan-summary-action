@@ -1,40 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
+
+	"github.com/danielriddell21/unum/pkg/terraform"
 )
-
-type plan struct {
-	ResourceChanges []resourceChange `json:"resource_changes"`
-}
-
-type resourceChange struct {
-	Address string `json:"address"`
-	Change  change `json:"change"`
-}
-
-type change struct {
-	Actions []string `json:"actions"`
-}
-
-func actionLabel(actions []string) string {
-	switch strings.Join(actions, ",") {
-	case "create":
-		return "➕ create"
-	case "delete":
-		return "🗑️ destroy"
-	case "update":
-		return "📝 update"
-	case "create,delete", "delete,create":
-		return "🔄 replace"
-	default:
-		return strings.Join(actions, " ")
-	}
-}
 
 func main() {
 	planFile := "plan.json"
@@ -48,55 +20,27 @@ func main() {
 		os.Exit(1)
 	}
 
-	var p plan
-	if err := json.Unmarshal(data, &p); err != nil {
+	plan, err := terraform.Parse(data)
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to parse plan: %v\n", err)
 		os.Exit(1)
-	}
-
-	var changes []resourceChange
-	for _, r := range p.ResourceChanges {
-		if len(r.Change.Actions) == 1 && r.Change.Actions[0] == "no-op" {
-			continue
-		}
-		changes = append(changes, r)
-	}
-
-	counts := map[string]int{}
-	for _, r := range changes {
-		switch strings.Join(r.Change.Actions, ",") {
-		case "create":
-			counts["create"]++
-		case "delete":
-			counts["delete"]++
-		case "update":
-			counts["update"]++
-		default:
-			counts["replace"]++
-		}
 	}
 
 	var sb strings.Builder
 	sb.WriteString("## Terraform Plan\n\n")
 
-	if len(changes) == 0 {
+	if !plan.HasChanges() {
 		sb.WriteString("✅ No changes — infrastructure is up to date.\n")
 	} else {
-		fmt.Fprintf(&sb,
-			"**%d to add &nbsp;·&nbsp; %d to change &nbsp;·&nbsp; %d to destroy &nbsp;·&nbsp; %d to replace**\n\n",
-			counts["create"], counts["update"], counts["delete"], counts["replace"],
-		)
-		sb.WriteString("| Action | Resource |\n")
-		sb.WriteString("|--------|----------|\n")
-		for _, r := range changes {
-			fmt.Fprintf(&sb, "| %s | `%s` |\n", actionLabel(r.Change.Actions), r.Address)
-		}
-
-		if diff := unumDiff(planFile); diff != "" {
-			sb.WriteString("\n<details><summary>Field-level diff</summary>\n\n```diff\n")
-			sb.WriteString(diff)
-			sb.WriteString("\n```\n\n</details>\n")
-		}
+		sb.WriteString("Terraform will perform the following actions:\n\n")
+		sb.WriteString("```diff\n")
+		sb.WriteString(plan.RenderDiff(terraform.RenderOptions{
+			MarkerFirst: true,
+			BangUpdates: true,
+		}))
+		sb.WriteString("```\n\n")
+		fmt.Fprintf(&sb, "Plan: %d to add, %d to change, %d to destroy, %d to replace.\n",
+			plan.AddCount(), plan.ChangeCount(), plan.DestroyCount(), plan.ReplaceCount())
 	}
 
 	output := sb.String()
@@ -109,19 +53,4 @@ func main() {
 		}
 	}
 	fmt.Print(output)
-}
-
-func unumDiff(planFile string) string {
-	out, err := exec.Command(
-		"unum", "diff",
-		"--format", "terraform",
-		"--no-color",
-		"--no-stat",
-		"--quiet",
-		planFile, planFile,
-	).Output()
-	if err != nil {
-		return ""
-	}
-	return strings.TrimSpace(string(out))
 }

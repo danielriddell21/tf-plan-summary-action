@@ -2,14 +2,19 @@
   "resource_changes": [
     {
       "address": "aws_instance.web",
+      "type": "aws_instance",
+      "name": "web",
       "change": {
         "actions": ["create"],
         "before": null,
-        "after": {"ami": "ami-123", "instance_type": "t3.micro"}
+        "after": {"ami": "ami-123", "instance_type": "t3.micro"},
+        "after_unknown": {"arn": true, "id": true}
       }
     },
     {
       "address": "aws_security_group.web",
+      "type": "aws_security_group",
+      "name": "web",
       "change": {
         "actions": ["create"],
         "before": null,
@@ -18,14 +23,18 @@
     },
     {
       "address": "aws_s3_bucket.assets",
+      "type": "aws_s3_bucket",
+      "name": "assets",
       "change": {
         "actions": ["update"],
-        "before": {"versioning": {"enabled": false}},
-        "after": {"versioning": {"enabled": true}}
+        "before": {"acl": "private", "versioning": {"enabled": false}},
+        "after": {"acl": "private", "versioning": {"enabled": true}}
       }
     },
     {
       "address": "aws_instance.legacy",
+      "type": "aws_instance",
+      "name": "legacy",
       "change": {
         "actions": ["delete"],
         "before": {"ami": "ami-old", "instance_type": "t2.micro"},
@@ -34,6 +43,8 @@
     },
     {
       "address": "aws_cloudwatch_log_group.app",
+      "type": "aws_cloudwatch_log_group",
+      "name": "app",
       "change": {
         "actions": ["no-op"],
         "before": {},
