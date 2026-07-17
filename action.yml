@@ -21,7 +21,7 @@ runs:
 
     - name: Build summariser
       shell: bash
-      run: go build -o /tmp/tf-plan-summary "${{ github.action_path }}"
+      run: go build -C "${{ github.action_path }}" -o /tmp/tf-plan-summary .
 
     - name: Write plan summary
       shell: bash
