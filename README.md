@@ -49,7 +49,7 @@ Plan: 2 to add, 1 to change, 1 to destroy, 0 to replace.
   run: terraform show -json tfplan > plan.json
 
 - name: Terraform Plan Summary
-  uses: danielriddell21/tf-plan-summary-action@v1
+  uses: danielriddell21/tf-plan-summary-action@v2
   with:
     plan-file: plan.json
 ```
