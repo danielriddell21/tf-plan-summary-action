@@ -13,11 +13,12 @@ jobs:
 
       - uses: actions/setup-go@v7
         with:
-          go-version: "1.26"
+          go-version-file: go.mod
           cache: false
 
+      # The version go.mod requires, so a new unum release cannot redden CI.
       - name: Install unum
-        run: go install github.com/danielriddell21/unum/cmd/unum@latest
+        run: go install "github.com/danielriddell21/unum/cmd/unum@$(go list -m -f '{{.Version}}' github.com/danielriddell21/unum)"
 
       - name: Run tests
         run: bash scripts/test.sh
